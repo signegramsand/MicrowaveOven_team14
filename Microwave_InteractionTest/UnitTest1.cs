@@ -12,7 +12,7 @@ namespace Microwave_InteractionTest
         [Test]
         public void Test1()
         {
-            Assert.Pass();
+            Assert.Pass(); 
         }
     }
 }
