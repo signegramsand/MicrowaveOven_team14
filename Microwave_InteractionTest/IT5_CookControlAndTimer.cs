@@ -68,18 +68,64 @@ namespace Microwave_InteractionTest.Test.Unit
         {
             //Arrange
             powerButtonSut.Press(); // State set to SetPower
-            timeButtonSut.Press(); //State set to SetTime
-            timeButtonSut.Press(); //State set to SetTime with 2 seconds
+            timeButtonSut.Press(); //State set to SetTime with a 1 minute timer.
+
 
             //Act
             startCancelButtonSut.Press();
             display.ClearReceivedCalls();
 
-            Thread.Sleep(1000);
+            Thread.Sleep(1005); // Wait one tick
 
             //Assert
             display.Received(1).ShowTime(Arg.Any<int>(), Arg.Any<int>());
 
+        }
+
+        [Test]
+        public void StateSetTime_StartCancelPressed_TimerTickedTwice()
+        {
+            //Arrange
+            powerButtonSut.Press(); // State set to SetPower
+            timeButtonSut.Press(); //State set to SetTime with a 1 minute timer.
+
+
+            //Act
+            startCancelButtonSut.Press();
+            display.ClearReceivedCalls();
+            powerTube.ClearReceivedCalls();
+
+            Thread.Sleep(2005); // Wait two ticks
+
+            //Assert
+            Assert.Multiple(() =>
+            {
+                display.Received(2).ShowTime(Arg.Any<int>(), Arg.Any<int>());
+                powerTube.Received(0).TurnOff();
+            });
+        }
+
+        [Test]
+        public void StateSetTime_StartCancelPressed_TimerExpired()
+        {
+            //Arrange
+            powerButtonSut.Press(); // State set to SetPower
+            timeButtonSut.Press(); //State set to SetTime with a 1 minute timer.
+
+
+            //Act
+            startCancelButtonSut.Press();
+            display.ClearReceivedCalls();
+            powerTube.ClearReceivedCalls();
+
+            Thread.Sleep(60005); // Wait a minute so timer expires
+
+            //Assert
+            Assert.Multiple(() =>
+            {
+                display.Received(60).ShowTime(Arg.Any<int>(), Arg.Any<int>());
+                powerTube.Received(1).TurnOff();
+            });
         }
     }
 }
