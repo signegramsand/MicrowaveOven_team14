@@ -1,4 +1,5 @@
-﻿using Microwave.Classes.Boundary;
+﻿using System;
+using Microwave.Classes.Boundary;
 using Microwave.Classes.Controllers;
 using Microwave.Classes.Interfaces;
 using NSubstitute;
@@ -54,5 +55,71 @@ namespace Microwave_InteractionTest
             //State is ready by default
 
         }
+
+        [Test]
+        public void StateSetTime_StartCancelPress_PowerTubeTurnsOn()
+        {
+            //Arrange
+            powerButtonSut.Press(); //State set to SetPower
+
+            timeButtonSut.Press(); //State set to SetTime
+
+            //Act
+            startCancelButtonSut.Press();
+
+            //Assert
+            powerTube.Received(1).TurnOn(Arg.Any<int>());
+
+        }
+
+        [Test]
+        public void StateCooking_StartCancelPress_PowerTubeTurnsOn()
+        {
+            //Arrange
+            powerButtonSut.Press(); //State set to SetPower
+
+            timeButtonSut.Press(); //State set to SetTime
+
+            startCancelButtonSut.Press(); //State set to Cooking
+            powerTube.ClearReceivedCalls();
+
+
+            //Act
+            startCancelButtonSut.Press();
+
+            //Assert
+            powerTube.Received(1).TurnOff();
+
+        }
+
+        [Test]
+        public void StateCooking_CookingTimerExpired_DisplayClearedAndLightTurnedOff()
+        {
+            //Arrange
+            powerButtonSut.Press(); //State set to SetPower
+
+            timeButtonSut.Press(); //State set to SetTime
+
+            startCancelButtonSut.Press(); //State set to Cooking
+
+            display.ClearReceivedCalls();
+            light.ClearReceivedCalls();
+            powerTube.ClearReceivedCalls();
+
+            //Act
+            timer.Expired += Raise.Event();
+
+            //Assert
+            Assert.Multiple(() =>
+            {
+                powerTube.Received(1).TurnOff();
+                light.Received(1).TurnOff();
+                display.Received(1).Clear();
+
+            });
+            
+        }
+
+
     }
 }
