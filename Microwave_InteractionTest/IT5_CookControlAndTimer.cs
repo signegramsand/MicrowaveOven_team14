@@ -123,8 +123,32 @@ namespace Microwave_InteractionTest
             //Assert
             Assert.Multiple(() =>
             {
-                display.Received(60).ShowTime(Arg.Any<int>(), Arg.Any<int>());
+                display.Received(60-1).ShowTime(Arg.Any<int>(), Arg.Any<int>());
                 powerTube.Received(1).TurnOff();
+            });
+        }
+
+
+        [Test]
+        public void StateSetTime_StartCancelPressed_TimerNotExpired()
+        {
+            //Arrange
+            powerButtonSut.Press(); // State set to SetPower
+            timeButtonSut.Press(); //State set to SetTime with a 1 minute timer.
+
+
+            //Act
+            startCancelButtonSut.Press();
+            display.ClearReceivedCalls();
+            powerTube.ClearReceivedCalls();
+
+            Thread.Sleep(59005); // Wait a litte less than a minute so timer doesn't expire
+
+            //Assert
+            Assert.Multiple(() =>
+            {
+                display.Received(59).ShowTime(Arg.Any<int>(), Arg.Any<int>());
+                powerTube.Received(0).TurnOff();
             });
         }
     }
