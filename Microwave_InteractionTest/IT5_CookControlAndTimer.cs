@@ -75,7 +75,7 @@ namespace Microwave_InteractionTest
             startCancelButtonSut.Press();
             display.ClearReceivedCalls();
 
-            Thread.Sleep(1005); // Wait one tick
+            Thread.Sleep(1100); // Wait one tick
 
             //Assert
             display.Received(1).ShowTime(Arg.Any<int>(), Arg.Any<int>());
@@ -95,7 +95,7 @@ namespace Microwave_InteractionTest
             display.ClearReceivedCalls();
             powerTube.ClearReceivedCalls();
 
-            Thread.Sleep(2005); // Wait two ticks
+            Thread.Sleep(2100); // Wait two ticks
 
             //Assert
             Assert.Multiple(() =>
@@ -118,12 +118,12 @@ namespace Microwave_InteractionTest
             display.ClearReceivedCalls();
             powerTube.ClearReceivedCalls();
 
-            Thread.Sleep(60005); // Wait a minute so timer expires
+            Thread.Sleep(60100); // Wait a minute so timer expires
 
             //Assert
             Assert.Multiple(() =>
             {
-                display.Received(60-1).ShowTime(Arg.Any<int>(), Arg.Any<int>());
+                display.Received(60).ShowTime(Arg.Any<int>(), Arg.Any<int>());
                 powerTube.Received(1).TurnOff();
             });
         }
@@ -142,7 +142,7 @@ namespace Microwave_InteractionTest
             display.ClearReceivedCalls();
             powerTube.ClearReceivedCalls();
 
-            Thread.Sleep(59005); // Wait a litte less than a minute so timer doesn't expire
+            Thread.Sleep(59100); // Wait a litte less than a minute so timer doesn't expire
 
             //Assert
             Assert.Multiple(() =>
