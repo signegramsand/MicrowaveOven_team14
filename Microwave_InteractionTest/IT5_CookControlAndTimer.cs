@@ -6,7 +6,7 @@ using NSubstitute;
 using NUnit.Framework;
 using Timer = Microwave.Classes.Boundary.Timer;
 
-namespace Microwave_InteractionTest.Test.Unit
+namespace Microwave_InteractionTest
 {
     [TestFixture]
     public class IT5_CookControlAndTimer

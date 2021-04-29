@@ -8,7 +8,7 @@ using Microwave.Classes.Interfaces;
 using NSubstitute;
 using NUnit.Framework;
 
-namespace Microwave_InteractionTest.Test.Unit
+namespace Microwave_InteractionTest
 {
     [TestFixture]
     public class IT4_UIAndLight
