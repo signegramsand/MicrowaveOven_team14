@@ -40,6 +40,7 @@ namespace Microwave_InteractionTest.Test.Unit
         {
             //Arrange
             timer = new Timer();
+            
 
             output = new Output();
 
@@ -65,6 +66,11 @@ namespace Microwave_InteractionTest.Test.Unit
             cooker.UI = UI;
 
             //State is ready by default
+        }
+        [TearDown]
+        public void TearDown()
+        {
+            timer.Stop(); //Stopping timer, to avoid "ghost-timers" in subsequent tests
         }
 
 
@@ -174,8 +180,11 @@ namespace Microwave_InteractionTest.Test.Unit
 
 
             Assert.That(NumberOfCorrectCallsRecieved.Count == 1, Is.True);
+           
 
         }
+
+
 
         [Test]
         public void StateSetTime_StartCancelPressed_TimerExpiresOutputIsCorrect()
@@ -206,7 +215,7 @@ namespace Microwave_InteractionTest.Test.Unit
 
             List<string> NumberOfCorrectLightOffCallsRecieved = OutputLines.Where(x =>
                 (x.ToLower().Contains("light") && x.ToLower().Contains("off") && !x.ToLower().Contains(" w"))
-            ).ToList();           
+            ).ToList();
 
             List<string> NumberOfCorrectPowertubeOffCallsRecieved = OutputLines.Where(x =>
                 (x.ToLower().Contains("powertube") && x.ToLower().Contains("off") && !x.ToLower().Contains(" w"))
@@ -220,10 +229,7 @@ namespace Microwave_InteractionTest.Test.Unit
                 Assert.That(NumberOfCorrectLightOffCallsRecieved.Count == 1, Is.True);
                 Assert.That(NumberOfCorrectPowertubeOffCallsRecieved.Count == 1, Is.True);
             });
-
-
         }
-
 
         [Test]
         public void StateCooking_DoorOpens_DisplayClears()
@@ -255,6 +261,8 @@ namespace Microwave_InteractionTest.Test.Unit
 
 
 
+
+
         [Test]
         public void StateSetTime_StartCancelPressed_PowerTubeTurnsOn()
         {
@@ -278,7 +286,7 @@ namespace Microwave_InteractionTest.Test.Unit
             List<string> NumberOfCorrectCallsRecieved = OutputLines.Where(x =>
                 (x.ToLower().Contains("powertube") && x.ToLower().Contains("works"))).ToList();
 
-
+            
             Assert.That(NumberOfCorrectCallsRecieved.Count == 1, Is.True);
 
         }
