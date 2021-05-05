@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Xml.Linq;
+using System.Threading;
 using Microwave.Classes.Boundary;
 using Microwave.Classes.Controllers;
 using Microwave.Classes.Interfaces;
 using NSubstitute;
 using NUnit.Framework;
+using Timer = Microwave.Classes.Boundary.Timer;
 
 namespace Microwave_InteractionTest.Test.Unit
 {
     [TestFixture]
-    public class IT7_OutputAndSystemWithoutTimer
+    public class IT8_CompleteSystemAndTimer
     {
         private Door doorSut;
         private UserInterface UI;
@@ -23,7 +23,7 @@ namespace Microwave_InteractionTest.Test.Unit
         private Button startCancelButtonSut;
 
         private Light light;
-        private ITimer timer;
+        private Timer timer;
 
         private Output output;
 
@@ -39,7 +39,7 @@ namespace Microwave_InteractionTest.Test.Unit
         public void Setup()
         {
             //Arrange
-            timer = Substitute.For<ITimer>();
+            timer = new Timer();
 
             output = new Output();
 
@@ -67,6 +67,7 @@ namespace Microwave_InteractionTest.Test.Unit
             //State is ready by default
         }
 
+
         [Test]
         public void StateReady_DoorOpen_LightTurnsOnAndOutputIsCalled()
         {
@@ -80,17 +81,17 @@ namespace Microwave_InteractionTest.Test.Unit
 
             string[] OutputLines = ConsoleReader.ToString().Split("\r\n");
 
-            
+
             List<string> NumberOfCorrectCallsRecieved = OutputLines.Where(x =>
                 (x.ToLower().Contains("light") && x.ToLower().Contains("on"))
             ).ToList();
 
-            Assert.That(NumberOfCorrectCallsRecieved.Count == 1,Is.True);
+            Assert.That(NumberOfCorrectCallsRecieved.Count == 1, Is.True);
 
         }
 
 
-   
+
 
 
         [Test]
@@ -103,7 +104,7 @@ namespace Microwave_InteractionTest.Test.Unit
             //Act
             ConsoleReader.GetStringBuilder().Clear();
             doorSut.Close();
-            
+
 
             //Assert
 
@@ -158,8 +159,9 @@ namespace Microwave_InteractionTest.Test.Unit
             //Act
             startCancelButtonSut.Press(); //State set to cooking
             ConsoleReader.GetStringBuilder().Clear();
-            timer.TimerTick += Raise.Event();
-            
+
+            Thread.Sleep(1100);
+
 
 
             //Assert
@@ -172,6 +174,53 @@ namespace Microwave_InteractionTest.Test.Unit
 
 
             Assert.That(NumberOfCorrectCallsRecieved.Count == 1, Is.True);
+
+        }
+
+        [Test]
+        public void StateSetTime_StartCancelPressed_TimerExpiresOutputIsCorrect()
+        {
+            //Arrange
+            powerButtonSut.Press(); // State set to SetPower
+            timeButtonSut.Press(); //State set to SetTime with a 1 minute timer.
+
+
+
+            //Act
+            ConsoleReader.GetStringBuilder().Clear();
+            startCancelButtonSut.Press(); //State set to cooking
+            Thread.Sleep(60200);
+
+
+
+            //Assert
+            string[] OutputLines = ConsoleReader.ToString().Split("\r\n");
+
+
+            List<string> NumberOfCorrectTickCallsRecieved = OutputLines.Where(x =>
+                (x.ToLower().Contains("display") && x.ToLower().Contains("shows") && !x.ToLower().Contains(" w"))
+            ).ToList();
+
+            List<string> NumberOfCorrectClearCallsRecieved = OutputLines.Where(x =>
+                (x.ToLower().Contains("display") && x.ToLower().Contains("clear"))).ToList();
+
+            List<string> NumberOfCorrectLightOffCallsRecieved = OutputLines.Where(x =>
+                (x.ToLower().Contains("light") && x.ToLower().Contains("off") && !x.ToLower().Contains(" w"))
+            ).ToList();           
+
+            List<string> NumberOfCorrectPowertubeOffCallsRecieved = OutputLines.Where(x =>
+                (x.ToLower().Contains("powertube") && x.ToLower().Contains("off") && !x.ToLower().Contains(" w"))
+            ).ToList();
+
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(NumberOfCorrectTickCallsRecieved.Count == 60, Is.True);
+                Assert.That(NumberOfCorrectClearCallsRecieved.Count == 1, Is.True);
+                Assert.That(NumberOfCorrectLightOffCallsRecieved.Count == 1, Is.True);
+                Assert.That(NumberOfCorrectPowertubeOffCallsRecieved.Count == 1, Is.True);
+            });
+
 
         }
 
@@ -212,7 +261,7 @@ namespace Microwave_InteractionTest.Test.Unit
             //Arrange
             powerButtonSut.Press(); // State set to SetPower
             timeButtonSut.Press(); //State set to SetTime with a 1 minute timer.
-            
+
 
 
             //Act
@@ -264,5 +313,7 @@ namespace Microwave_InteractionTest.Test.Unit
             Assert.That(NumberOfCorrectCallsRecieved.Count == 1, Is.True);
 
         }
+
+
     }
 }

@@ -24,7 +24,7 @@ namespace Microwave.Classes.Boundary
 
         public void Start(int time)
         {
-            TimeRemaining = time;
+            TimeRemaining = time; 
             timer.Enabled = true;
         }
 

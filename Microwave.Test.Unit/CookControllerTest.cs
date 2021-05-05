@@ -43,6 +43,8 @@ namespace Microwave.Test.Unit
             powerTube.Received().TurnOn(50/7);
         }
 
+
+
         [Test]
         public void Cooking_TimerTick_DisplayCalled()
         {
